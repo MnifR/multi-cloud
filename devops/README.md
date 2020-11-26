@@ -416,9 +416,9 @@ GCP_PROJECT_ID=$GCP_PROJECT_ID
 
 # Documentation
 
-[Authenticating and Reading Secrets With Hashicorp Vault](https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/)
-[How to setup Vault with Kubernetes](https://deepsource.io/blog/setup-vault-kubernetes/)
-[HashiCorp Vault on GKE with Terraform](https://github.com/sethvargo/vault-on-gke)
-[GitOps in Kubernetes: How to do it with GitLab CI and Argo CD](https://medium.com/@andrew.kaczynski/gitops-in-kubernetes-argo-cd-and-gitlab-ci-cd-5828c8eb34d6)
-[ArgoCD User Management](https://argoproj.github.io/argo-cd/operator-manual/user-management/)
-[Google Cloud Registry (GCR) with external Kubernetes](http://docs.heptio.com/content/private-registries/pr-gcr.html)
+- [Authenticating and Reading Secrets With Hashicorp Vault](https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/)
+- [How to setup Vault with Kubernetes](https://deepsource.io/blog/setup-vault-kubernetes/)
+- [HashiCorp Vault on GKE with Terraform](https://github.com/sethvargo/vault-on-gke)
+- [GitOps in Kubernetes: How to do it with GitLab CI and Argo CD](https://medium.com/@andrew.kaczynski/gitops-in-kubernetes-argo-cd-and-gitlab-ci-cd-5828c8eb34d6)
+- [ArgoCD User Management](https://argoproj.github.io/argo-cd/operator-manual/user-management/)
+- [Google Cloud Registry (GCR) with external Kubernetes](http://docs.heptio.com/content/private-registries/pr-gcr.html)
