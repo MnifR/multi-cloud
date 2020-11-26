@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-demo-dev
+  namespace: argocd
+spec:
+  project: demo-dev
+  source:
+    repoURL: <GIT_REPOSITORY_URL>
+    targetRevision: HEAD
+    path: envs/dev
+  destination:
+    server: <SW_KAPSULE_CLUSTER_URL>
+    namespace: app-dev
+  syncPolicy:
+    automated:
+      prune: true

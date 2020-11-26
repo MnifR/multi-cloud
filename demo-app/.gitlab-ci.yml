@@ -1,0 +1,40 @@
+stages:
+  - publish
+
+publish docker image:
+  stage: publish
+  image: 
+    name: eu.gcr.io/${GCP_PROJECT_ID}/tools
+  script: 
+    - eval $(ssh-agent -s)
+    - echo "$GITLAB_SSH_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ssh -T git@gitlab.com
+
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global push.followTags true
+
+    - IMAGE_TAG=$CI_COMMIT_TAG-$CI_COMMIT_SHORT_SHA
+    - cd src
+    - gcloud config set project ${GCP_PROJECT_ID}
+    - gcloud builds submit . --tag=eu.gcr.io/${GCP_PROJECT_ID}/demo:$IMAGE_TAG --project ${GCP_PROJECT_ID} --gcs-log-dir=gs://${GCP_PROJECT_ID}_cloudbuild/logs
+    - git clone "git@gitlab.com:stack-labs/internal/sandbox/chabanerefes/meetup/demo-env.git"
+    - cd demo-env/envs/dev
+    - kustomize edit set image eu.gcr.io/${GCP_PROJECT_ID}/demo:$IMAGE_TAG
+    - cd ../..
+    - git add .
+    - 'git commit -m "ci: update image to $IMAGE_TAG"'
+    - git tag -a -m "New release available - $CI_COMMIT_TAG" $CI_COMMIT_TAG
+    - git push -o ci.skip
+  tags:
+    - k8s-dev-runner
+  only:
+    refs:
+      - tags
+    changes:
+      - src/**/*
+
+

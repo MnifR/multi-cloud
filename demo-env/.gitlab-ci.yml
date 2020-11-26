@@ -1,0 +1,67 @@
+stages:
+  - init
+  - deploy
+
+# Get Scaleway credentials from Vault
+before_script:
+    - export VAULT_TOKEN="$(gcloud secrets versions access latest --secret=vault-token --project ${GCP_PROJECT_ID})"
+    - export SCW_SECRET_KEY="$(vault kv get -field=key scaleway/project/${SW_PROJECT_NAME}/credentials/secret)"
+    - export AROGOCD_TOKEN="$(gcloud secrets versions access latest --secret=argocd-token --project ${GCP_PROJECT_ID})"
+
+init sw k8s project 🔬:
+  stage: init
+  when: manual
+  image:
+    name: eu.gcr.io/${GCP_PROJECT_ID}/tools
+  script:
+    # Connect to GCP GKE DevOps Cluster
+    - gcloud container clusters get-credentials gke-cluster-devops --zone europe-west1-b --project ${GCP_PROJECT_ID}
+    # Connect to scaleway
+    - scw init secret-key=$SCW_SECRET_KEY
+    # Get kubeconfig from sw kapsule cluster
+    - scw k8s kubeconfig get $(scw k8s cluster list | grep kapsule-cluster-dev-demo | awk '{ print $1 }') region=fr-par > kapsule_config
+    # Register kapsule cluster on Argocd
+    - export KUBECONFIG=~/.kube/config:$(pwd)/kapsule_config
+    - argocd cluster add admin@kapsuleclusterdevdemo --name kapsule-cluster-dev-demo --kubeconfig kapsule_config --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web 
+    # Create namespace on kapsule cluster
+    - kubectl config use-context admin@kapsuleclusterdevdemo
+    - kubectl create namespace app-dev || echo 'namespace app-dev already exists'
+    # To accesss GCR service, create the json key file and associate it with the service account
+    - gcloud iam service-accounts keys create sw-gcr-auth-ro.json --iam-account=sw-gcr-auth-ro@${GCP_PROJECT_ID}.iam.gserviceaccount.com
+    - export GCR_SECRET_NAME=gcp-gcr-auth-ro
+    - |
+      kubectl create secret docker-registry $GCR_SECRET_NAME -n app-dev \
+      --docker-server=https://eu.gcr.io \
+      --docker-username=_json_key \
+      --docker-email=ci@stack-labs.com \
+      --docker-password="$(cat sw-gcr-auth-ro.json)" || echo 'secret $GCR_SECRET_NAME already exists'
+    - |
+      kubectl patch serviceaccount default -n app-dev \
+      -p "{\"imagePullSecrets\": [{\"name\": \"$GCR_SECRET_NAME\"}]}"
+  tags:
+    - k8s-dev-runner
+  only:
+    - master 
+
+deploy sw k8s project 🚀:
+  stage: deploy
+  when: manual
+  image:
+    name: eu.gcr.io/${GCP_PROJECT_ID}/tools
+  script:
+    # Connect to scaleway
+    - scw init secret-key=$SCW_SECRET_KEY
+    # Get sw kapsule cluster url
+    - export SW_KAPSULE_CLUSTER_URL=$(scw k8s cluster get $(scw k8s cluster list | grep kapsule-cluster-dev-demo | awk '{ print $1 }') | grep ClusterURL | awk '{ print $2 }' | tr -d '\r')
+    - cd envs/dev
+    - sed -i "s,<SW_KAPSULE_CLUSTER_URL>,$SW_KAPSULE_CLUSTER_URL,g;s,<GIT_REPOSITORY_URL>,$CI_PROJECT_URL.git,g" application.yaml
+    # Connecto to gcp gke devops cluster
+    - gcloud container clusters get-credentials gke-cluster-devops --zone europe-west1-b --project ${GCP_PROJECT_ID}
+    # Create ArgoCD project
+    - argocd proj create demo-dev -d $SW_KAPSULE_CLUSTER_URL,app-dev -s $CI_PROJECT_URL.git --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web 
+    # Create ArgoCD application
+    - kubectl apply -n argocd -f application.yaml
+  tags:
+    - k8s-dev-runner
+  only:
+    - master

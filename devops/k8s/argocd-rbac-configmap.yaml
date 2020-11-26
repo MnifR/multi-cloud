@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # policies
+  policy.default: role:readonly
+  policy.csv: |
+    p, role:demo-admins, applications, create, *, allow
+    p, role:demo-admins, applications, get, *, allow
+    p, role:demo-admins, applications, list, *, allow
+    p, role:demo-admins, clusters, create, *, allow
+    p, role:demo-admins, clusters, get, *, allow
+    p, role:demo-admins, clusters, list, *, allow
+    p, role:demo-admins, projects, create, *, allow
+    p, role:demo-admins, projects, get, *, allow
+    p, role:demo-admins, projects, list, *, allow
+    p, role:demo-admins, repositories, create, *, allow
+    p, role:demo-admins, repositories, get, *, allow
+    p, role:demo-admins, repositories, list, *, allow
+
+    g, gitlab, role:demo-admins

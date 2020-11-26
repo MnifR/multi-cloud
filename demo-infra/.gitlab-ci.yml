@@ -1,0 +1,44 @@
+stages:
+  - init
+  - deploy
+
+# Get Scaleway credentials from Vault
+before_script:
+    - export VAULT_TOKEN="$(gcloud secrets versions access latest --secret=vault-token --project ${GCP_PROJECT_ID})"
+    - export SCW_ACCESS_KEY="$(vault kv get -field=key scaleway/project/${SW_PROJECT_NAME}/credentials/access)"
+    - export SCW_SECRET_KEY="$(vault kv get -field=key scaleway/project/${SW_PROJECT_NAME}/credentials/secret)"
+    - export SCW_DEFAULT_ORGANIZATION_ID="$(vault kv get -field=id scaleway/project/${SW_PROJECT_NAME}/config)"
+
+init sw infrastructure 🔬:
+  stage: init
+  image:
+    name: eu.gcr.io/${GCP_PROJECT_ID}/tools
+  script:
+    - cd envs/dev
+    # Init terraform
+    - |
+       terraform init \
+        -backend-config="bucket=bucket-${GCP_PROJECT_ID}-sw-gcp-terraform-backend" \
+        -backend-config="prefix=scaleway/terraform/state" \
+        ../../plan/
+  artifacts:
+    paths:
+      - envs/dev/.terraform
+  tags:
+    - k8s-dev-runner
+  only:
+    - master 
+
+deploy sw infrastructure 🚀:
+  stage: deploy
+  image:
+    name: eu.gcr.io/${GCP_PROJECT_ID}/tools
+  script:
+    - cd envs/dev
+    # Deploy sw ressources
+    - terraform apply -auto-approve ../../plan/ 
+  tags:
+    - k8s-dev-runner
+  only:
+    - master 
+

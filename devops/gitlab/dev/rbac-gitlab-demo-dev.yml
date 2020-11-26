@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ksa-sw-devops-gitlab-deployer
+  namespace: sw-dev
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: role-ksa-sw-devops-gitlab-deployer
+  namespace: sw-dev
+rules:
+- apiGroups: [""] # "" indicates the sw API group
+  resources: ["pods", "pods/exec", "secrets"]
+  verbs: ["get", "list", "watch", "create", "patch", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rolebinding-ksa-sw-devops-gitlab-deployer
+  namespace: sw-dev
+subjects:
+- kind: ServiceAccount
+  name: ksa-sw-devops-gitlab-deployer # Name is case sensitive
+  apiGroup: ""
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: role-ksa-sw-devops-gitlab-deployer # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io

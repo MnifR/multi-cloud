@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: argocd-server-https-ingress
+  namespace: argocd
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.global-static-ip-name: argocd
+    networking.gke.io/managed-certificates: argocd
+spec:
+  backend:
+    serviceName: argocd-server
+    servicePort: http
+  rules:
+  - host: argocd.<PUBLIC_DNS_NAME>
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: argocd-server
+          servicePort: http
+#  tls:
+#    - hosts:
+#      - argocd.<PUBLIC_DNS_NAME>
+#      secretName: argocd-secret
+

@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', 
+  '--build-arg',
+  'VAULT_CA=${_VAULT_CA}',
+  '--build-arg',
+  'GITLAB_SSH_KEY=${_GITLAB_SSH_KEY}',
+  '-t', 'eu.gcr.io/${_PROJECT_ID}/tools:$_VERSION', 
+  '.' ]
+
+images:
+   - 'eu.gcr.io/${_PROJECT_ID}/tools:$_VERSION'

@@ -1,0 +1,3 @@
+.terraform
+infra/tls/ca.pem
+infra/tls/vault.pem

@@ -1,0 +1,10 @@
+# ----------------------------------------------------
+# apiVersion and kind of Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Adds namespace to all resources.
+namespace: app-dev
+resources:
+- demo-deployment.yaml
+- demo-svc.yaml
