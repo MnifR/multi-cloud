@@ -18,7 +18,7 @@ RUN curl -sS "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terr
     rm terraform.zip
 
 # Install sw cli 
-ENV SCW_VERSION=2.2.2
+ENV SCW_VERSION=2.2.3
 RUN curl -o /usr/local/bin/scw -L "https://github.com/scaleway/scaleway-cli/releases/download/v${SCW_VERSION}/scw-${SCW_VERSION}-linux-x86_64"
 RUN chmod +x /usr/local/bin/scw
 
