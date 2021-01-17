@@ -12,8 +12,8 @@ export GCP_GKE_CLUSTER_ZONE=europe-west1-b
 
 export GCP_KUBE_CONTEXT_NAME="gke_${GCP_PROJECT_ID}_${GCP_GKE_CLUSTER_ZONE}_gke-cluster-devops"
 
-export PUBLIC_DNS_NAME=demo-cre.stack-labs.com
-export PUBLIC_DNS_ZONE_NAME=demo-cre
+export PUBLIC_DNS_NAME=
+export PUBLIC_DNS_ZONE_NAME=
 
 export TERRAFORM_BUCKET_NAME=bucket-${GCP_PROJECT_ID}-sw-gcp-terraform-backend
 ```
