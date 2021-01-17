@@ -380,7 +380,7 @@ Install [sw-cli](https://github.com/scaleway/scaleway-cli)
 scw init
 ```
 
-Create a service account to allow kapsule to access GCR cluster
+Create a service account to allow kapsule to access Google Container Registry
 
 ```shell
 SW_SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create sw-gcr-auth-ro)
