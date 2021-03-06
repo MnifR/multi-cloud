@@ -10,6 +10,9 @@ data:
   # policies
   policy.default: role:readonly
   policy.csv: |
+    p, role:demo-admins, applications, sync, *, allow
+    p, role:demo-admins, applications, update, *, allow
+    p, role:demo-admins, applications, override, *, allow
     p, role:demo-admins, applications, create, *, allow
     p, role:demo-admins, applications, get, *, allow
     p, role:demo-admins, applications, list, *, allow
