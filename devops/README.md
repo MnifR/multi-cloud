@@ -195,6 +195,10 @@ gcloud beta secrets versions add gitlab-ssh-key --data-file=./id_rsa
 
 ```shell
 GITLAB_SSH_KEY=$(gcloud secrets versions access latest --secret=gitlab-ssh-key)
+ARGOCD_VERSION=1.7.4
+VAULT_VERSION=1.6.0
+TERRAFORM_VERSION=0.13.6
+SCW_VERSION=2.2.3
 ```
 
 Create docker image with vault, argocd, terraform, gcloud sdk, sw cli. It will be used by the gitlab runner
@@ -202,7 +206,7 @@ Create docker image with vault, argocd, terraform, gcloud sdk, sw cli. It will b
 ```shell
 cd docker
 gcloud builds submit --config cloudbuild.yaml --substitutions \
-_VAULT_CA="$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' ../infra/tls/ca.pem)",_VERSION="latest",_GITLAB_SSH_KEY="$GITLAB_SSH_KEY",_PROJECT_ID="$GCP_PROJECT_ID"
+_ARGOCD_VERSION="$ARGOCD_VERSION,_VAULT_VERSION="$VAULT_VERSION,_TERRAFORM_VERSION="$TERRAFORM_VERSION,_SCW_VERSION="$SCW_VERSION,_VAULT_CA="$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' ../infra/tls/ca.pem)",_VERSION="latest",_GITLAB_SSH_KEY="$GITLAB_SSH_KEY",_PROJECT_ID="$GCP_PROJECT_ID"
 ```
 
 Install Helm 3

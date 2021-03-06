@@ -21,7 +21,7 @@ publish docker image:
     - cd src
     - gcloud config set project ${GCP_PROJECT_ID}
     - gcloud builds submit . --tag=eu.gcr.io/${GCP_PROJECT_ID}/demo:$IMAGE_TAG --project ${GCP_PROJECT_ID} --gcs-log-dir=gs://${GCP_PROJECT_ID}_cloudbuild/logs
-    - git clone "git@gitlab.com:stack-labs/internal/sandbox/chabanerefes/meetup/demo-env.git"
+    - git clone "git@gitlab.com:Chabane87/multi-cloud-google-cloud-scaleway-playground.git"
     - cd demo-env/envs/dev
     - kustomize edit set image eu.gcr.io/${GCP_PROJECT_ID}/demo:$IMAGE_TAG
     - cd ../..

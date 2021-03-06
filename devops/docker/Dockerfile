@@ -1,24 +1,26 @@
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 RUN gcloud components install kustomize kpt kubectl alpha beta
 
+ARG ARGOCD_VERSION
+ARG VAULT_VERSION
+ARG TERRAFORM_VERSION
+ARG SCW_VERSION
+
 # install argocd
-RUN curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')/argocd-linux-amd64
+RUN curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64
 RUN chmod +x /usr/local/bin/argocd
 
 # install vault
-ENV VAULT_VERSION=1.6.0
 RUN curl -sS "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip" > vault.zip && \
     unzip vault.zip -d /usr/bin && \
     rm vault.zip
 
 # install terraform
-ENV TERRAFORM_VERSION=0.12.24
 RUN curl -sS "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" > terraform.zip && \
     unzip terraform.zip -d /usr/bin && \
     rm terraform.zip
 
 # Install sw cli 
-ENV SCW_VERSION=2.2.3
 RUN curl -o /usr/local/bin/scw -L "https://github.com/scaleway/scaleway-cli/releases/download/v${SCW_VERSION}/scw-${SCW_VERSION}-linux-x86_64"
 RUN chmod +x /usr/local/bin/scw
 

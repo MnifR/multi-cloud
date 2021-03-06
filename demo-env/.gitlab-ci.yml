@@ -22,9 +22,9 @@ init sw k8s project 🔬:
     - scw k8s kubeconfig get $(scw k8s cluster list | grep kapsule-cluster-dev-demo | awk '{ print $1 }') region=fr-par > kapsule_config
     # Register kapsule cluster on Argocd
     - export KUBECONFIG=~/.kube/config:$(pwd)/kapsule_config
-    - argocd cluster add admin@kapsuleclusterdevdemo --name kapsule-cluster-dev-demo --kubeconfig kapsule_config --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web 
+    - argocd cluster add admin@kapsule-cluster-dev-demo --name kapsule-cluster-dev-demo --kubeconfig kapsule_config --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web  || echo 'cluster already added'
     # Create namespace on kapsule cluster
-    - kubectl config use-context admin@kapsuleclusterdevdemo
+    - kubectl config use-context admin@kapsule-cluster-dev-demo
     - kubectl create namespace app-dev || echo 'namespace app-dev already exists'
     # To accesss GCR service, create the json key file and associate it with the service account
     - gcloud iam service-accounts keys create sw-gcr-auth-ro.json --iam-account=sw-gcr-auth-ro@${GCP_PROJECT_ID}.iam.gserviceaccount.com
@@ -58,7 +58,7 @@ deploy sw k8s project 🚀:
     # Connecto to gcp gke devops cluster
     - gcloud container clusters get-credentials gke-cluster-devops --zone europe-west1-b --project ${GCP_PROJECT_ID}
     # Create ArgoCD project
-    - argocd proj create demo-dev -d $SW_KAPSULE_CLUSTER_URL,app-dev -s $CI_PROJECT_URL.git --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web 
+    - argocd proj create demo-dev -d $SW_KAPSULE_CLUSTER_URL,app-dev -s $CI_PROJECT_URL.git --auth-token=${AROGOCD_TOKEN} --server ${ARGOCD_ADDR} --grpc-web || echo 'project already created' 
     # Create ArgoCD application
     - kubectl apply -n argocd -f application.yaml
   tags:

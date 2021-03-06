@@ -1,7 +1,7 @@
 resource "scaleway_k8s_cluster_beta" "k8s-cluster-demo" {
   name = "kapsule-cluster-${var.env}-demo"
   description = "K8S Demo ${var.env} Cluster"
-  version = "1.19.4"
+  version = var.k8s_cluster_version
   cni = "calico"
   enable_dashboard = true
   ingress = "nginx"
@@ -22,7 +22,7 @@ resource "scaleway_k8s_pool_beta" "k8s-pool-demo" {
   cluster_id = scaleway_k8s_cluster_beta.k8s-cluster-demo.id
   name = "kapsule-pool-${var.env}-demo"
   node_type = "DEV1-M"
-  size = 3
+  size = var.k8s_pool_size
   autoscaling = true
   autohealing = true
   min_size = 1
